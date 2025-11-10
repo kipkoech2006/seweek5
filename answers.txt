@@ -1,0 +1,70 @@
+1. Problem Definition (6 points)
+Hypothetical AI Problem: Predicting student dropout rates in undergraduate programs
+3 Objectives:
+
+Identify at-risk students early (by end of first semester)
+Achieve 85% accuracy in predicting dropouts 6 months in advance
+Reduce overall dropout rate by 15% through timely interventions
+
+2 Stakeholders:
+
+Academic advisors and student success coordinators
+University administration and financial aid officers
+
+KPI:
+Intervention Success Rate = (Number of at-risk students who complete their degree after intervention) / (Total number of flagged at-risk students) × 100
+
+2. Data Collection & Preprocessing (8 points)
+2 Data Sources:
+
+Student Information System (SIS): Academic records, grades, attendance, course enrollment history, demographic data
+Learning Management System (LMS): Online engagement metrics, assignment submissions, discussion forum participation, login frequency
+
+1 Potential Bias:
+Historical bias - If the training data reflects past institutional biases (e.g., certain demographic groups receiving less support or facing systemic barriers), the model may perpetuate these inequities by unfairly flagging students from underrepresented groups as high-risk.
+3 Preprocessing Steps:
+
+Handling missing data: Use multiple imputation for sporadic missing values; remove records with >30% missing features; create "missing" indicator variables for systematic absences
+Feature normalization: Apply standardization (z-score normalization) to continuous variables like GPA and engagement scores to ensure equal weighting
+Encoding categorical variables: One-hot encode nominal features (major, demographic categories); ordinal encode ranked features (class year)
+
+
+3. Model Development (8 points)
+Model Choice: Gradient Boosting (XGBoost)
+Justification:
+
+Handles mixed data types (categorical and numerical) effectively
+Provides feature importance rankings to identify key dropout factors
+Robust to outliers and missing data
+Superior performance on tabular data compared to neural networks
+Interpretable results crucial for stakeholder trust and intervention planning
+
+Data Split Strategy:
+
+70% training, 15% validation, 15% test
+Use stratified sampling to maintain class distribution (dropout vs. retention)
+Implement temporal split: train on older cohorts, validate/test on recent cohorts to simulate real-world deployment
+
+2 Hyperparameters to Tune:
+
+Learning rate (eta): Controls model complexity and training speed; lower values (0.01-0.1) prevent overfitting but require more iterations
+Max depth: Limits tree complexity; tuning (3-10) balances model expressiveness against overfitting risk, especially important given potential class imbalance
+
+
+4. Evaluation & Deployment (8 points)
+2 Evaluation Metrics:
+
+Recall (Sensitivity): Prioritizes identifying all actual dropouts to ensure no at-risk student is missed. Critical because false negatives (missed dropouts) have severe consequences for students.
+Precision-Recall AUC: Better than accuracy for imbalanced classes (dropouts are typically minority class). Shows model performance across different threshold settings, allowing administrators to balance intervention resources.
+
+Concept Drift:
+Concept drift occurs when the statistical properties of the target variable change over time, making the model less accurate. Examples: pandemic shifts to online learning, changes in admission policies, or economic conditions affecting dropout patterns.
+Monitoring Strategy:
+
+Track model performance metrics monthly on new cohorts
+Compare predicted vs. actual dropout rates
+Set automated alerts when performance degrades >10%
+Retrain model quarterly with recent data
+
+1 Technical Deployment Challenge:
+Real-time prediction scalability: The system must process predictions for thousands of students multiple times per semester while integrating with various institutional databases. Challenge includes managing API rate limits, ensuring low latency for advisor dashboards, and maintaining data synchronization across SIS/LMS systems. Solution: Implement batch prediction jobs during off-peak hours with caching, and use microservices architecture for independent scaling.
